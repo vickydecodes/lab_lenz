@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+
+<div class="header">
+  <h1>Lab Lens Dashboard</h1>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+  <div class="info-box">
+    <p id="student"></p>
+    <p id="time"></p>
+  </div>
+
+  <div class="apps-container">
+    <h3>Running Applications</h3>
+    <div id="apps"></div>
+  </div>
+
+</div>
+
+<script>
+
+  function setUser(username) {
+    document.getElementById("student").innerText =
+            "Student: " + username;
+  }
+
+  function updateTime() {
+    document.getElementById("time").innerText =
+            "Time: " + new Date().toLocaleTimeString();
+  }
+
+  setInterval(updateTime, 1000);
+
+  function updateApps(apps) {
+    const container = document.getElementById("apps");
+    container.innerHTML = "";
+    apps.forEach(app => {
+      const div = document.createElement("div");
+      div.className = "app-item";
+      div.innerText = app;
+      container.appendChild(div);
+    });
+  }
+
+  function logout() {
+    window.javaApp.logout();
+  }
+
+</script>
+
+</body>
+</html>

@@ -1,27 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.web.WebView?>
 
-<VBox spacing="15" alignment="CENTER"
-      xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.lablens.ui.DashboardController">
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="com.lablens.ui.DashboardController">
 
-    <padding>
-        <Insets top="20" right="20" bottom="20" left="20"/>
-    </padding>
+    <WebView fx:id="webView"/>
 
-    <Label text="Lab Lens" style="-fx-font-size: 22px; -fx-font-weight: bold;"/>
-
-    <Label fx:id="studentNameLabel"/>
-
-    <Label fx:id="sessionStartLabel"/>
-
-    <Label fx:id="currentTimeLabel"/>
-
-    <Label text="Running Applications:" style="-fx-font-weight: bold;"/>
-
-    <ListView fx:id="appListView" prefHeight="200"/>
-
-</VBox>
+</StackPane>

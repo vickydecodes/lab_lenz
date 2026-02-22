@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Lab Lens Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+    <h2>Lab Lens Login</h2>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <select id="role">
+        <option>STUDENT</option>
+        <option>HOD</option>
+    </select>
+
+    <button onclick="login()">Login</button>
+    <button onclick="goRegister()">Register</button>
+</div>
+
+<script>
+    function login() {
+        const username = document.getElementById("username").value;
+        window.javaApp.login(username);
+        window.javaApp.loadPage("dashboard.html");
+    }
+
+    function goRegister() {
+        window.location.href = "register.html";
+    }
+</script>
+
+</body>
+</html>

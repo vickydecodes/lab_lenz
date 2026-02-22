@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="card">
+    <h2>Register</h2>
+
+    <input id="username" placeholder="Username">
+    <input id="password" type="password" placeholder="Password">
+
+    <select id="role">
+        <option>STUDENT</option>
+        <option>HOD</option>
+    </select>
+
+    <button onclick="register()">Register</button>
+    <button onclick="goLogin()">Back</button>
+</div>
+
+<script>
+    function register() {
+        alert("Register clicked (backend connect next)");
+    }
+
+    function goLogin() {
+        window.location.href = "login.html";
+    }
+</script>
+
+</body>
+</html>

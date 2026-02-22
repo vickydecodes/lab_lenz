@@ -1,24 +1,52 @@
 package com.lablens;
 
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import netscape.javascript.JSObject;
 
 public class Main extends Application {
 
+    private static WebView webView;
+    private static final JavaBridge bridge = new JavaBridge(); // ONE instance
+
+    public static WebView getWebView() {
+        return webView;
+    }
+
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
 
-        FXMLLoader loader = new FXMLLoader(
-                getClass().getResource("/dashboard.fxml")
-        );
+        webView = new WebView();
 
-        Scene scene = new Scene(loader.load(), 500, 350);
+        loadPage("login.html");
 
-        stage.setTitle("Lab Lens UI");
+        Scene scene = new Scene(webView, 900, 600);
+
+        stage.setTitle("Lab Lens");
         stage.setScene(scene);
         stage.show();
+    }
+
+    public static void loadPage(String page) {
+
+        webView.getEngine().load(
+                Main.class.getResource("/" + page).toExternalForm()
+        );
+
+        webView.getEngine().getLoadWorker().stateProperty().addListener(
+                (obs, oldState, newState) -> {
+
+                    if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+
+                        JSObject window =
+                                (JSObject) webView.getEngine().executeScript("window");
+
+                        window.setMember("javaApp", bridge); // use same instance
+                    }
+                }
+        );
     }
 
     public static void main(String[] args) {

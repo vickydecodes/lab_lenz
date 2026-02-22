@@ -1,17 +1,12 @@
 package com.lablens.ui;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.util.Duration;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -21,19 +16,9 @@ import java.util.concurrent.TimeUnit;
 public class DashboardController {
 
     @FXML
-    private Label studentNameLabel;
+    private WebView webView;
 
-    @FXML
-    private Label sessionStartLabel;
-
-    @FXML
-    private Label currentTimeLabel;
-
-    @FXML
-    private ListView<String> appListView;
-
-    private final DateTimeFormatter formatter =
-            DateTimeFormatter.ofPattern("HH:mm:ss");
+    private WebEngine engine;
 
     private final ScheduledExecutorService scheduler =
             Executors.newSingleThreadScheduledExecutor();
@@ -41,34 +26,29 @@ public class DashboardController {
     @FXML
     public void initialize() {
 
-        studentNameLabel.setText("Student: Vicky");
+        engine = webView.getEngine();
+        engine.load(getClass().getResource("/dashboard.html").toExternalForm());
 
-        String startTime = LocalTime.now().format(formatter);
-        sessionStartLabel.setText("Session Started: " + startTime);
-
-        startClock();
-        startAppMonitoring();
+        engine.getLoadWorker().stateProperty().addListener((obs, oldState, newState) -> {
+            if (newState == javafx.concurrent.Worker.State.SUCCEEDED) {
+                startMonitoring();  // start only after page fully loads
+            }
+        });
     }
 
-    private void startClock() {
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.seconds(1), event -> {
-                    String now = LocalTime.now().format(formatter);
-                    currentTimeLabel.setText("Current Time: " + now);
-                })
-        );
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
-
-    private void startAppMonitoring() {
-
+    private void startMonitoring() {
         scheduler.scheduleAtFixedRate(() -> {
+            System.out.println("Monitoring tick...");
 
             Set<String> apps = getRunningApps();
 
             Platform.runLater(() -> {
-                appListView.getItems().setAll(apps);
+                String jsArray = apps.stream()
+                        .map(app -> "'" + app + "'")
+                        .reduce((a, b) -> a + "," + b)
+                        .orElse("");
+
+                engine.executeScript("updateApps([" + jsArray + "]);");
             });
 
         }, 0, 5, TimeUnit.SECONDS);
@@ -91,16 +71,13 @@ public class DashboardController {
 
             while ((line = reader.readLine()) != null) {
 
-                if (line.startsWith("Image Name") || line.startsWith("=")) {
+                if (line.startsWith("Image Name") || line.startsWith("="))
                     continue;
-                }
 
                 if (!line.trim().isEmpty()) {
                     String processName = line.split("\\s+")[0];
 
-                    // basic filtering
                     if (!processName.equalsIgnoreCase("svchost.exe")
-                            && !processName.equalsIgnoreCase("RuntimeBroker.exe")
                             && !processName.equalsIgnoreCase("System")) {
 
                         uniqueApps.add(processName);
